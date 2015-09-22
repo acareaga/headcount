@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/acareaga/headcount.png?label=ready&title=Ready)](https://waffle.io/acareaga/headcount)
 ## Headcount
 
 Data analysis tools that help policymakers and the public better understand education statistics in Colorado.
