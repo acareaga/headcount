@@ -1,5 +1,5 @@
-require 'csv'  # => true
-require 'pry'  # => true
+require 'csv'
+require 'pry'
 
 class DistrictRepository
 
@@ -7,7 +7,7 @@ class DistrictRepository
 
   def initialize(repo_data)
     @repo_data = repo_data
-  end                       # => nil
+  end
 
   def find_by_name(district_name)
     @districts = repo_data.map { |row| [row.fetch(:location), row.fetch(:data)] }.to_h
@@ -24,19 +24,19 @@ class DistrictRepository
     # make sure to downcase
 
     # District.new || nil
-  end                                                               # => :find_by_name
+  end
 
   def find_all_matching(fragment)
     # recieves a String
     # returns either [] or one or more matches which contain the supplied name fragment, case insensitive
     # make sure to downcase
-  end                              # => :find_all_matching
+  end
 
   def economic_profile
     free_or_reduced_lunch_in_year
     # collection of data sets for each district
     # move to class eventually
-  end                   # => :economic_profile
+  end
 
   def free_or_reduced_lunch_in_year(year)
 
@@ -49,9 +49,9 @@ class DistrictRepository
     fullpath  = File.join path, filename
     repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
     DistrictRepository.new(repo_data)
-  end            # => :from_csv
-end              # => :from_csv
+  end
+end
 
-Hash[:key, "value"]                # => {:key=>"value"}
-Hash[:key, Hash[:key2, "value"]]   # => {:key=>{:key2=>"value"}}
-[["a",1], ["b",2], ["c", 3]].to_h  # => {"a"=>1, "b"=>2, "c"=>3}
+Hash[:key, "value"]
+Hash[:key, Hash[:key2, "value"]]
+[["a",1], ["b",2], ["c", 3]].to_h
