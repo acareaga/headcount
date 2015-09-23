@@ -6,6 +6,7 @@ require 'pry'
 
 class DistrictRepositoryTest < Minitest::Test
   def test_district_repo_class_exists
+    skip
     repo_data = []
     repo = DistrictRepository.new(repo_data)
     assert_equal DistrictRepository, repo.class
@@ -67,8 +68,20 @@ class TestEconomicProfile < Minitest::Test
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
-    repo       =
+
     assert_equal 0.125, district.economic_profile.free_or_reduced_lunch_in_year(2012)
+  end
+
+  def test_district_repository_is_not_nil
+    skip
+    repo_data  = [ "ACADEMY 20", {:district => 123}]
+    repository = DistrictRepository.new(repo_data)
+    refute_equal nil, repository
+  end
+
+  def test_something_about_economic_profile
+    skip
+    assert_equal 123, EconomicProfile.new({district_data: 123}).free_or_reduced_lunch_by_year
   end
 
 end
