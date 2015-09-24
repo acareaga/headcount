@@ -3,34 +3,35 @@ require 'pry'
 
 class EconomicProfile
 
-  attr_reader :district_data, :name
+  attr_reader :data, :name
 
-  def initialize
-    @name = name
+  def initialize(data)
+    @data = data
   end
 
   def free_or_reduced_lunch_in_year(year)
-    0.125
+     data.values_at(year).pop
   end
 
   def free_or_reduced_lunch_by_year
-    @district_data.values[0]
+    data
+    # @district_data.values[0]
     # takes in a integer year
     # returns data representing a percentage
   end
-
 end
 
 class District
 
-  attr_accessor :economic_profile
+  attr_accessor :data
 
-  def initialize(name)
+  def initialize(name, data)
     @name = name
+    @data = data
   end
 
   def economic_profile
-    EconomicProfile.new
+    EconomicProfile.new(data)
   end
 
 end
@@ -46,9 +47,28 @@ class DistrictRepository
     #   }.to_h
   end
 
+  def data
+    {2000 => 0.020,
+     2001 => 0.024,
+     2002 => 0.027,
+     2003 => 0.030,
+     2004 => 0.034,
+     2005 => 0.058,
+     2006 => 0.041,
+     2007 => 0.050,
+     2008 => 0.061,
+     2009 => 0.070,
+     2010 => 0.079,
+     2011 => 0.084,
+     2012 => 0.125,
+     2013 => 0.091,
+     2014 => 0.087,
+   }
+  end
+
   def find_by_name(name)
     # @districts_by_name[:location]
-    name = District.new("ACADEMY 20")
+    name = District.new(name, data)
     # if @memorized_districts[district] ||=
     #   @memorized_districts[district]
     # else @memorized_districts[district] =
