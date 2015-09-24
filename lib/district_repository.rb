@@ -52,11 +52,22 @@ class District
 
   def initialize(name, data)
     @name = name
-    @data = data
+  end
+
+  def name
+    @name
   end
 
   def economic_profile
     EconomicProfile.new(data)
+  end
+
+  def statewide_testing
+    StatewideTesting.new(data)
+  end
+
+  def enrollment
+    Enrollment.new(data)
   end
 
 end
@@ -65,35 +76,17 @@ class DistrictRepository
 
   attr_reader :district, :districts_by_name
 
-  def initialize(repo_data)
-    @districts_by_name = repo_data.map { |column| Hash[column.fetch(:location), Hash[column.fetch(:timeframe), Hash[column.fetch(:dataformat), column.fetch(:data)]]] }.map(&:to_h)
-    # data = districts_by_name.map do |row|
-    #   row.values_at("Colorado")
-    # end
-    # binding.pry
+  def initialize(districts_data)
+    @districts_by_name = districts_data.map do |row|
+       row.values_at("Colorado").first
+     end
+     binding.pry
   end
 
   def find_by_name(name)
-    data = districts_by_name.map { |row| row.values_at(name)}
-    binding.pry
-    name = District.new(name, data)
     @districts_by_name[name.upcase]
-
-    # .map { |district| district[:location] == name }
-
-    binding.pry
-
-    # if @memorized_districts[district] ||=
-    #   @memorized_districts[district]
-    # else @memorized_districts[district] =
-    #   @memorized_districts.find { |district| district.name == name}
-    # end
-    # @memorized_districts
     # # recieves a String
     # returns either nil or an instance of District having done a case insensitive search
-    # make sure to downcase
-
-    # District.new || nil
   end
 
   def find_all_matching(fragment)
@@ -110,13 +103,34 @@ class DistrictRepository
     filename  = 'Students qualifying for free or reduced price lunch.csv'
     fullpath  = File.join path, filename
     repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
+    districts_data = repo_data.map { |row| Hash[row.fetch(:location), Hash[row.fetch(:poverty_level), Hash[row.fetch(:timeframe), Hash[row.fetch(:dataformat), row.fetch(:data)]]]]}
 
-    DistrictRepository.new(repo_data)
+    DistrictRepository.new(districts_data)
   end
+
+  # def free_or_reduced_lunch_in_year
+  #
+  #   year:
+  #   data:
+  # end
 end
 
+
+
+
+
+
+
+# {|column| Hash[column.fetch(:location), Hash[column.fetch(:timeframe), Hash[column.fetch(:dataformat), column.fetch(:data)]]] }.map(&:to_h)
+# data = districts_by_name.map do |row|
+#   row.values_at("Colorado")
+# end
+
+
+
+
 # def data
-#   {"Colorado", {2000 => 0.020,
+#   {"Colorado" => {2000 => 0.020,
 #                 2001 => 0.024,
             #    2002 => 0.027,
             #    2003 => 0.030,
@@ -133,3 +147,10 @@ end
             #    2014 => 0.087,
 #  }}
 # end
+
+# if @memorized_districts[district] ||=
+#   @memorized_districts[district]
+# else @memorized_districts[district] =
+#   @memorized_districts.find { |district| district.name == name}
+# end
+# @memorized_districts
