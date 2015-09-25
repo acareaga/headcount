@@ -50,13 +50,22 @@ class District
 
   attr_accessor :data, :districts_by_name
 
-  def initialize(name, data)
+  def initialize(name, district_data)
     @name = name
+    @district_data = district_data
+    binding.pry
   end
 
   def name
     @name
   end
+
+  # def data
+  #   { economic_profile => {median_household_income, children_in_poverty, free_or_reduced_lunch, title_one_students },
+  #     statewide_testing => { # all files, },
+  #     enrollment => { # all files }
+  #   }
+  # end
 
   def economic_profile
     EconomicProfile.new(data)
@@ -76,15 +85,18 @@ class DistrictRepository
 
   attr_reader :district, :districts_by_name
 
-  def initialize(districts_data)
-    @districts_by_name = districts_data.map do |row|
-       row.values_at("Colorado").first
-     end
-     binding.pry
+  def initialize(repo_data)
+    @districts_by_name = repo_data.group_by { |name| name[:location]}
+    @districts_by_name.map { |name, district_data|
+      [name, District.new(name, district_data)]
+      }.to_h
+
+    # .group_by { |name| name[:location]}
+
   end
 
   def find_by_name(name)
-    @districts_by_name[name.upcase]
+    @districts_by_name[name]
     # # recieves a String
     # returns either nil or an instance of District having done a case insensitive search
   end
@@ -103,16 +115,16 @@ class DistrictRepository
     filename  = 'Students qualifying for free or reduced price lunch.csv'
     fullpath  = File.join path, filename
     repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
-    districts_data = repo_data.map { |row| Hash[row.fetch(:location), Hash[row.fetch(:poverty_level), Hash[row.fetch(:timeframe), Hash[row.fetch(:dataformat), row.fetch(:data)]]]]}
+    # .map { |row| {row.fetch(:location) => Hash[row.fetch(:poverty_level), Hash[row.fetch(:timeframe), Hash[row.fetch(:dataformat), row.fetch(:data)]]]}}
 
-    DistrictRepository.new(districts_data)
+    DistrictRepository.new(repo_data)
   end
 
-  # def free_or_reduced_lunch_in_year
-  #
-  #   year:
-  #   data:
+  # def free_or_reduced_lunch
+  #   a = {:free_or_reduced_lunch => file_data}
+  #   binding.pry
   # end
+
 end
 
 
