@@ -53,7 +53,6 @@ class District
   def initialize(name, district_data)
     @name = name
     @district_data = district_data
-    binding.pry
   end
 
   def name
@@ -96,12 +95,19 @@ class DistrictRepository
   end
 
   def find_by_name(name)
-    @districts_by_name[name]
+    @districts_by_name[name.upcase]
     # # recieves a String
     # returns either nil or an instance of District having done a case insensitive search
   end
 
   def find_all_matching(fragment)
+    @districts_by_name.keys.each do |name|
+      if name.include?("ACAD")
+        puts name
+      else
+        []
+      end
+    end
     # recieves a String
     # returns either [] or one or more matches which contain the supplied name fragment, case insensitive
     # make sure to downcase

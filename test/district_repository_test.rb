@@ -22,12 +22,13 @@ class DistrictRepositoryTest < Minitest::Test
     skip
     repository = DistrictRepository.from_csv('./test/data')
     district = repository.find_by_name("ACADEMY 20")
+    assert_equal "ACADEMY 20", district[0][:location]
   end
 
   def test_it_can_find_all_matching
-    skip
     repository = DistrictRepository.from_csv('./test/data')
-    district = repository.find_all_matching("ACADEMY 20")
+    district = repository.find_all_matching("ACAD")
+    assert_equal "ACADEMY 20", district
   end
 
   def test_find_by_name_returns_nil_when_dist_does_not_exist
