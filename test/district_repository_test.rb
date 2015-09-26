@@ -14,7 +14,7 @@ class DistrictRepositoryTest < Minitest::Test
   def test_it_can_find_by_name
     repository = DistrictRepository.from_csv('./test/data')
     district = repository.find_by_name("ACADEMY 20")
-    assert_equal "ACADEMY 20", district[0][:location]
+    assert_equal "ACADEMY 20", district.name
   end
 
   def test_it_can_find_all_matching
@@ -32,7 +32,7 @@ class DistrictRepositoryTest < Minitest::Test
   def test_find_by_name_is_case_insensitive
     repository = DistrictRepository.from_csv('./test/data')
     district = repository.find_by_name("AcaDemY 20")
-    assert_equal "ACADEMY 20", district[0][:location]
+    assert_equal "ACADEMY 20", district.name
   end
 
   def test_find_all_matching_is_case_insensitive
@@ -48,9 +48,9 @@ class DistrictRepositoryTest < Minitest::Test
   end
 
   def test_find_all_matching_with_incomplete_name_returns_nil
-    skip
+    skip  
     repository = DistrictRepository.from_csv('./test/data')
     district = repository.find_all_matching("duh")
-    assert_equal "{}", district
+    assert_equal [], district
   end
 end
