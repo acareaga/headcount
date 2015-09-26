@@ -101,16 +101,10 @@ class DistrictRepository
   end
 
   def find_all_matching(fragment)
-    @districts_by_name.keys.each do |name|
-      if name.include?("ACAD")
-        puts name
-      else
-        []
-      end
-    end
+    fragment = fragment.upcase
+    @districts_by_name.select { |name, district_data| name.include?(fragment) }
     # recieves a String
     # returns either [] or one or more matches which contain the supplied name fragment, case insensitive
-    # make sure to downcase
   end
 
 
