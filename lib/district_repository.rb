@@ -5,9 +5,8 @@ class DistrictRepository
 
   attr_reader :district, :districts_by_name
 
-  def initialize(repo_data)
-    @districts_by_name = repo_data.group_by { |name| name[:location]}
-    @districts_by_name.map { |name, district_data|
+  def initialize(districts_data)
+    @districts_by_name = districts_data.map { |name, district_data|
       [name.upcase, District.new(name, district_data)]
       }.to_h
   end
@@ -28,8 +27,8 @@ class DistrictRepository
     filename  = 'Students qualifying for free or reduced price lunch.csv'
     fullpath  = File.join path, filename
     repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
-
-    DistrictRepository.new(repo_data)
+    districts_data = repo_data.group_by { |name| name[:location]}
+    DistrictRepository.new(districts_data)
   end
 
 end

@@ -6,20 +6,15 @@ require 'pry'
 
 class District
 
-  attr_accessor :data, :districts_by_name
+  attr_accessor :name, :district_data
 
   def initialize(name, district_data)
     @name = name.upcase
     @district_data = district_data
   end
 
-  def name
-    @name
-    # returns the upcased string name of the district
-  end
-
   def economic_profile
-    EconomicProfile.new(data)
+    EconomicProfile.new(name, district_data)
     # returns a new instance of the econ profile class
   end
 
