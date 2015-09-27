@@ -14,11 +14,6 @@ class StatewideTesting
 
   def initialize(name, district_data)
     @district_data = district_data
-    # @free_or_reduced_lunch_by_year = district_data
-    #   .select { |row| row.fetch(:dataformat) == "Percent" }
-    #   .select { |row| row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
-    #   .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
-
     # zip multiple files together, use data as enumerable??
 
     @proficient_by_grade = district_data
