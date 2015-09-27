@@ -15,12 +15,12 @@ class District
 
   def economic_profile
     EconomicProfile.new(name, district_data)
-    # returns a new instance of the econ profile class
+    # returns a new instance of the economic_profile class
   end
 
   def statewide_testing
-    StatewideTesting.new(data)
-    # returns a new instance of the statewide class
+    StatewideTesting.new(name, district_data)
+    # returns a new instance of the statewide_testing class
   end
 
   def enrollment
