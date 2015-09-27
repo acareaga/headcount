@@ -24,7 +24,7 @@ class DistrictRepository
   end
 
   def self.from_csv(path)
-    filename  = 'Title I students.csv'
+    filename  = '3rd grade students scoring proficient or above on the CSAP_TCAP.csv'
     fullpath  = File.join path, filename
     repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
     districts_data = repo_data.group_by { |name| name[:location]}
