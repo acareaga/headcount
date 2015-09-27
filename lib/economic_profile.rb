@@ -6,7 +6,7 @@ require 'pry'
 class EconomicProfile
 # Represents data from these files:
 # Median household income.csv
-# School-aged children   in poverty.csv
+# School-aged children in poverty.csv
 # Students qualifying for free or reduced price lunch.csv
 # Title I students.csv
 

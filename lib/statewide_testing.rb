@@ -17,9 +17,13 @@ class StatewideTesting
     # zip multiple files together, use data as enumerable??
 
     @proficient_by_grade = district_data
-      .select { |row| row.fetch(:score) == "Math" }
-      .map { |column| [column.fetch(:timeframe).to_i, Hash[column.fetch(:score).downcase, column.fetch(:data).rjust(5, "0")[0..4].to_f]] }.to_h
+      .group_by { |year| year[:timeframe]}
+      # .select { |row| row.fetch(:score) == "Reading" }
+      # .select { |row| row.fetch(:score) == "Writing" }
+      # .select { |row| row.fetch(:score) == "Math" }
+      # .map { |column| [column.fetch(:timeframe).to_i, Hash[column.fetch(:score).downcase, column.fetch(:data).rjust(5, "0")[0..4].to_f]] }.to_h
   end
+
 
   def proficient_by_grade(grade)
     @proficient_by_grade

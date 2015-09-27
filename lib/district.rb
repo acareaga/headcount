@@ -5,7 +5,6 @@ require './lib/enrollment'
 require 'pry'
 
 class District
-
   attr_accessor :name, :district_data
 
   def initialize(name, district_data)
@@ -24,15 +23,7 @@ class District
   end
 
   def enrollment
-    Enrollment.new(data)
+    Enrollment.new(name, district_data)
     # returns a new instance of the enrollement class
   end
-
 end
-
-# def data
-#   { economic_profile => {median_household_income, children_in_poverty, free_or_reduced_lunch, title_one_students },
-#     statewide_testing => { # all files, },
-#     enrollment => { # all files }
-#   }
-# end
