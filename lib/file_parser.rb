@@ -3,38 +3,41 @@ require 'csv'
 require 'pry'
 
 class FileParser
-  attr_reader :path, :repo_data
+  attr_reader :path, :repo_data, :filename
 
   def initialize(path)
     @path = path
     @repo_data = repo_data
+    @filename = filename
   end
 
-  def read_file(filename) # joins path and reads file
-    fullpath  = File.join path, filename
+  def read_file(file_name) # joins path and reads file
+    fullpath  = File.join path, file_name
     repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
   end
 
   # zip multiple files together, use data as enumerable??
-  def file_loader(repo_data) # staging area to parse all files
-    @repo_data.each { |repo_data| repo_data
+  def file_loader
+    parse_free_or_reduced_lunch_by_year
+     # staging area to parse all files
+     # .each { |repo_data| repo_data
       # pass repo_data to file parsers
       # ECONOMIC PROFILE
-      .parse_free_or_reduced_lunch_by_year
-      .parse_school_aged_children_in_poverty_by_year
-      .parse_title_1_students_by_year
-      # STATEWIDE TESTING
-      .parse_proficient_by_grade
+      # parse_free_or_reduced_lunch_by_year
+      # .parse_school_aged_children_in_poverty_by_year
+      # .parse_title_1_students_by_year
+      # # STATEWIDE TESTING
+      # .parse_proficient_by_grade
       # ENROLLMENT
-    }
   end
 
   # ECONOMIC PROFILE FILES -- finished migration, need to test
   def parse_free_or_reduced_lunch_by_year
-    filename = [ 'Students qualifying for free or reduced price lunch.csv' ]
-      .each { |filename| read_file(filename) }
-      .group_by { |name| name[:location] }
+    filename       = ['Students qualifying for free or reduced price lunch.csv']
+    repo_data      = read_file(filename)
+    districts_data = repo_data.group_by { |name| name[:location] }.values
       .select { |row| row.fetch(:dataformat) == "Percent" }
+      binding.pry
       .select { |row| row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
       .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
   end

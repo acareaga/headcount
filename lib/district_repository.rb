@@ -1,5 +1,6 @@
 require 'csv'
 require 'pry'
+require './lib/file_parser'
 
 class DistrictRepository
 
@@ -27,7 +28,7 @@ class DistrictRepository
     # kicks off distric repo & inits parser
     # enters file_loader and reads file
     # need to connect repo data with methods above
-    districts_data = FileParser.new(path).file_loader)
+    districts_data = FileParser.new(path).file_loader
     DistrictRepository.new(districts_data)
   end
 
@@ -48,13 +49,13 @@ class DistrictRepository
   #   DistrictRepository.new(districts_data)
   # end
 
-  def self.from_csv(path)
-    filename  = '8th grade students scoring proficient or above on the CSAP_TCAP.csv'
-    fullpath  = File.join path, filename
-    repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
-    districts_data = repo_data.group_by { |name| name[:location]}
-    DistrictRepository.new(districts_data)
-  end
+  # def self.from_csv(path)
+  #   filename  = '8th grade students scoring proficient or above on the CSAP_TCAP.csv'
+  #   fullpath  = File.join path, filename
+  #   repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
+  #   districts_data = repo_data.group_by { |name| name[:location]}
+  #   DistrictRepository.new(districts_data)
+  # end
 end
 
 # if @memorized_districts[district] ||=
