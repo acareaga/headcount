@@ -14,14 +14,12 @@ class EconomicProfileTest < Minitest::Test
   end
 
   def test_district_repository_is_not_nil
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     assert_equal DistrictRepository, repository.class
   end
 
   def test_free_or_reduced_lunch_in_year_returns_nil_for_unknown_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
@@ -30,7 +28,6 @@ class EconomicProfileTest < Minitest::Test
   end
 
   def test_free_or_reduced_lunch_BY_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district = repository.find_by_name("ACADEMY 20")
@@ -38,7 +35,6 @@ class EconomicProfileTest < Minitest::Test
   end
 
   def test_it_finds_children_by_poverty_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district = repository.find_by_name("ACADEMY 20")
@@ -47,7 +43,6 @@ class EconomicProfileTest < Minitest::Test
   end
 
   def test_school_aged_children_in_poverty_in_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district = repository.find_by_name("ADAMS COUNTY 14")
@@ -56,7 +51,6 @@ class EconomicProfileTest < Minitest::Test
   end
 
   def test_school_aged_children_in_poverty_in_year_returns_nil_for_unknown_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district = repository.find_by_name("ACADEMY 20")
@@ -65,7 +59,6 @@ class EconomicProfileTest < Minitest::Test
   end
 
   def test_title_1_students_by_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district = repository.find_by_name("ACADEMY 20")
@@ -74,7 +67,6 @@ class EconomicProfileTest < Minitest::Test
   end
 
   def test_title_1_students_in_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district = repository.find_by_name("ACADEMY 20")
@@ -82,7 +74,6 @@ class EconomicProfileTest < Minitest::Test
   end
 
   def test_title_1_students_in_year_returns_nil_for_unfound_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district = repository.find_by_name("ACADEMY 20")
