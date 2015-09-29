@@ -45,8 +45,8 @@ class FileParser
     percent = h.map { |district, data| district = district, data = data
       .select { |row| row = row.fetch(:dataformat) == "Percent" }
       .select { |row| row = row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }.to_h
-      .map { |key, value| key = key, Hash[:economic_profile, Hash[:free_or_reduced_lunch, value]] }
+      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }
+      .map { |key, value| key = key, Hash[:economic_profile, Hash[:free_or_reduced_lunch, value]] }.to_h
     @data << percent
   end
 
@@ -57,20 +57,25 @@ class FileParser
     percent = h.map { |district, data| district = district, data = data
       .select { |row| row = row.fetch(:dataformat) == "Percent" }
       .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }.to_h
-      .map { |key, value| key = key, Hash[:economic_profile, Hash[:school_aged_children_in_poverty, value]] }
+      .map { |key, value| key = key, Hash[:economic_profile, Hash[:school_aged_children_in_poverty, value]] }.to_h
     @data << percent
   end
 
   def parse_title_1_students_by_year
-    filename = [ 'Title I students.csv' ]
-    repo_data      = read_file(filename)
+    filename  = [ 'Title I students.csv' ]
+    repo_data = read_file(filename)
     h = group_by(repo_data)
     percent = h.map { |district, data| district = district, data = data
       .select { |row| row = row.fetch(:dataformat) == "Percent" }
       .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }.to_h
-      .map { |key, value| key = key, Hash[:economic_profile, Hash[:title_1_students, value]] }
+      .map { |key, value| key = key, Hash[:economic_profile, Hash[:title_1_students, value]] }.to_h
     @data << percent
   end
+
+
+
+
+
 
   #STATEWIDE TESTING FILES -- need to fix select & mapping
   def parse_proficient_by_grade
