@@ -19,8 +19,9 @@ class FileParser
   def file_loader
     @data = []
     parse_free_or_reduced_lunch_by_year
+    parse_school_aged_children_in_poverty_by_year
+    parse_title_1_students_by_year
     binding.pry
-    # parse_school_aged_children_in_poverty_by_year
     # pass repo_data to file parsers
 
     # ECONOMIC PROFILE
@@ -46,27 +47,29 @@ class FileParser
       .select { |row| row = row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
       .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }.to_h
       .map { |key, value| key = key, Hash[:economic_profile, Hash[:free_or_reduced_lunch, value]] }
-      binding.pry
     @data << percent
   end
-
-  # .group_by { |name| name[:location] }
 
   def parse_school_aged_children_in_poverty_by_year
     filename       = [ 'School-aged children in poverty.csv' ]
     repo_data      = read_file(filename)
-        .select { |row| row.fetch(:dataformat) == "Percent" }
-        .group_by { |name| name[:location] }.to_h
-        .group_by { |file| :school_aged_children_in_poverty }
-    @data << repo_data
-      # .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+    h = group_by(repo_data)
+    percent = h.map { |district, data| district = district, data = data
+      .select { |row| row = row.fetch(:dataformat) == "Percent" }
+      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }.to_h
+      .map { |key, value| key = key, Hash[:economic_profile, Hash[:school_aged_children_in_poverty, value]] }
+    @data << percent
   end
 
   def parse_title_1_students_by_year
     filename = [ 'Title I students.csv' ]
-      .each { |filename| read_file(filename) }
-      .group_by { |name| name[:location] }
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+    repo_data      = read_file(filename)
+    h = group_by(repo_data)
+    percent = h.map { |district, data| district = district, data = data
+      .select { |row| row = row.fetch(:dataformat) == "Percent" }
+      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }.to_h
+      .map { |key, value| key = key, Hash[:economic_profile, Hash[:title_1_students, value]] }
+    @data << percent
   end
 
   #STATEWIDE TESTING FILES -- need to fix select & mapping
