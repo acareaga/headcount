@@ -3,7 +3,7 @@ require 'csv'
 require 'pry'
 
 class FileParser
-  attr_reader :path, :repo_data, :filename
+  attr_reader :path, :repo_data, :filename, :data
 
   def initialize(path)
     @path = path
@@ -16,38 +16,43 @@ class FileParser
     repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
   end
 
-  # zip multiple files together, use data as enumerable??
   def file_loader
+    @data = []
     parse_free_or_reduced_lunch_by_year
-     # staging area to parse all files
-     # .each { |repo_data| repo_data
-      # pass repo_data to file parsers
-      # ECONOMIC PROFILE
-      # parse_free_or_reduced_lunch_by_year
-      # .parse_school_aged_children_in_poverty_by_year
-      # .parse_title_1_students_by_year
-      # # STATEWIDE TESTING
-      # .parse_proficient_by_grade
-      # ENROLLMENT
+    # parse_school_aged_children_in_poverty_by_year
+    # pass repo_data to file parsers
+
+    # ECONOMIC PROFILE
+    # parse_free_or_reduced_lunch_by_year
+    # .parse_school_aged_children_in_poverty_by_year
+    # .parse_title_1_students_by_year
+    # # STATEWIDE TESTING
+    # .parse_proficient_by_grade
+    # ENROLLMENT
   end
 
   # ECONOMIC PROFILE FILES -- finished migration, need to test
   def parse_free_or_reduced_lunch_by_year
     filename       = ['Students qualifying for free or reduced price lunch.csv']
     repo_data      = read_file(filename)
-    districts_data = repo_data.group_by { |name| name[:location] }.values
-      .select { |row| row.fetch(:dataformat) == "Percent" }
-      binding.pry
-      .select { |row| row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+    .select { |row| row.fetch(:dataformat) == "Percent" }
+    .select { |row| row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
+    .group_by { |name| name[:location] }
+    binding.pry
+    .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+   @data << repo_data
   end
 
+  # .group_by { |name| name[:location] }
+
   def parse_school_aged_children_in_poverty_by_year
-    filename = [ 'School-aged children in poverty.csv' ]
-      .each { |filename| read_file(filename) }
-      .group_by { |name| name[:location] }
-      .select { |row| row.fetch(:dataformat) == "Percent" }
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+    filename       = [ 'School-aged children in poverty.csv' ]
+    repo_data      = read_file(filename)
+        .select { |row| row.fetch(:dataformat) == "Percent" }
+        .group_by { |name| name[:location] }.to_h
+        .group_by { |file| :school_aged_children_in_poverty }
+    @data << repo_data
+      # .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
   end
 
   def parse_title_1_students_by_year

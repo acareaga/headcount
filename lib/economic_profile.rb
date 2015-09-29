@@ -1,6 +1,7 @@
 require 'minitest/autorun'
 require 'minitest/pride'
 require './lib/district'
+require './lib/file_parser'
 require 'pry'
 
 class EconomicProfile
@@ -13,7 +14,7 @@ class EconomicProfile
   attr_reader :district_data, :name
 
   def initialize(name, district_data)
-    @district_data = district_data
+    @district_data = repo_data
     # group by year, turn the years into keys
     # filter to just the percents
     # return years and data as integers
