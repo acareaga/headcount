@@ -37,10 +37,11 @@ class FileParser
     repo_data      = read_file(filename)
     .select { |row| row.fetch(:dataformat) == "Percent" }
     .select { |row| row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
-    .group_by { |name| name[:location] }
-    binding.pry
-    .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
-   @data << repo_data
+    .group_by { |name, year, data| Hash[name[:location], Hash[:economic_profile, Hash[:free_or_reduced_lunch, :timeframe]]] }
+binding.pry
+    file = Hash[:economic_profile, Hash[:free_or_reduced_lunch, repo_data]]
+    # .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+   @data << file
   end
 
   # .group_by { |name| name[:location] }
