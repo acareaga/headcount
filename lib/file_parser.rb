@@ -19,6 +19,7 @@ class FileParser
   def file_loader
     @data = []
     parse_free_or_reduced_lunch_by_year
+    binding.pry
     # parse_school_aged_children_in_poverty_by_year
     # pass repo_data to file parsers
 
@@ -44,27 +45,9 @@ class FileParser
       .select { |row| row = row.fetch(:dataformat) == "Percent" }
       .select { |row| row = row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
       .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }.to_h
-    binding.pry
-
-    #
-    # percent = h.map { |district, data| district = district, data = data.select { |row|
-    #   row = row.fetch(:dataformat) == "Percent" } }.to_h
-    # data_type = percent.map { |district, data| district = district, data = data.select { |row|
-    #   row = row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" } }.to_h
-    # formatted = data_type.map { |district, data| district = district, data = data.map { |column|
-    #   [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h }.to_h
-      # row, [key.fetch(:dataformat) == "Percent"
-      # } }
-      # .rjust(5, "0")[0..4].to_f] ----
-#     .select { |row| row.fetch(:dataformat) == "Percent" }
-#     .select { |row| row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
-#     .group_by { |name, year, data| Hash[name[:location], Hash[:economic_profile, Hash[:free_or_reduced_lunch, :timeframe]]] }
-# binding.pry
-  repo_data.group_by { |district, rows|
-    data = district.map { |year, data| year = year.fetch(:timeframe), data = data.fetch(:data)} }
-  binding.pry
-    # .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
-   @data << file
+      .map { |key, value| key = key, Hash[:economic_profile, Hash[:free_or_reduced_lunch, value]] }
+      binding.pry
+    @data << percent
   end
 
   # .group_by { |name| name[:location] }
