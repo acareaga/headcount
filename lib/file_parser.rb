@@ -35,6 +35,7 @@ class FileParser
     parse_reading_proficiency
     parse_writing_proficiency
     repo_hash
+    binding.pry
   end
 
   def economic_profile_for(name)
@@ -62,7 +63,7 @@ class FileParser
     read_file(filename).each do |name, rows|
       data = rows.group_by { |row| row.fetch(:race_ethnicity) }
                  .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
                    [race_ethnicity, years_to_percentages]
                  }
                  .to_h
@@ -75,7 +76,7 @@ class FileParser
     read_file(filename).each do |name, rows|
       data = rows.group_by { |row| row.fetch(:race_ethnicity) }
                  .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
                    [race_ethnicity, years_to_percentages]
                  }
                  .to_h
@@ -88,7 +89,7 @@ class FileParser
     read_file(filename).each do |name, rows|
       data = rows.group_by { |row| row.fetch(:race_ethnicity) }
                  .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
                    [race_ethnicity, years_to_percentages]
                  }
                  .to_h
@@ -103,7 +104,7 @@ class FileParser
                  .map { |subject, rows|
                    percent_by_year = rows.map { |row|
                                            [ row.fetch(:timeframe).to_i,
-                                             row.fetch(:data).rjust(5, "0")[0..4].to_f
+                                             row.fetch(:data)[0..4].to_f
                                            ]
                                          }
                                          .to_h
@@ -120,7 +121,7 @@ class FileParser
                  .map { |subject, rows|
                    percent_by_year = rows.map { |row|
                                            [ row.fetch(:timeframe).to_i,
-                                             row.fetch(:data).rjust(5, "0")[0..4].to_f
+                                             row.fetch(:data)[0..4].to_f
                                            ]
                                          }
                                          .to_h
@@ -137,7 +138,7 @@ class FileParser
       data = rows.group_by { |row| row.fetch :category }
       .map { |race, rows|
         percents_by_year = rows.map { |row|
-          [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f]
+          [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f]
         }.to_h
         [race, percents_by_year]
       }.to_h
@@ -148,7 +149,7 @@ class FileParser
   def parse_graduation_rates
     filename  = 'High school graduation rates.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
       enrollment_for(name)[:graduation_rates] = data
     end
   end
@@ -156,7 +157,7 @@ class FileParser
   def parse_kindergarten_participation
     filename  = 'Kindergartners in full-day program.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
       enrollment_for(name)[:kindergarten_participation] = data
     end
   end
@@ -164,7 +165,7 @@ class FileParser
   def parse_online_participation
     filename  = 'Online pupil enrollment.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
       enrollment_for(name)[:online_participation] = data
     end
   end
@@ -184,7 +185,7 @@ class FileParser
                  .group_by { |row| row.fetch(:race) }
                  .map { |race, rows|
                    percent_by_year = rows.map { |row|
-                     [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f]
+                     [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f]
                    }.to_h
                    [race, percent_by_year]
                  }
@@ -197,7 +198,7 @@ class FileParser
     filename  = 'Special education.csv'
     read_file(filename).each do |name, rows|
       data = rows.select { |row| row.fetch(:dataformat) == 'Percent' }
-                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }
+                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }
                  .to_h
       enrollment_for(name)[:special_education] = data
     end
@@ -206,7 +207,7 @@ class FileParser
   def parse_remediation
     filename  = 'Remediation in higher education.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
       enrollment_for(name)[:remediation] = data
     end
   end
@@ -216,7 +217,7 @@ class FileParser
     filename = 'Students qualifying for free or reduced price lunch.csv'
     read_file(filename).each do |name, rows|
       data = rows.select { |row| row.fetch(:dataformat) == "Percent" && row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
-                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }
+                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }
                  .sort
                  .to_h
       economic_profile_for(name)[:free_or_reduced_lunch] = data
@@ -227,7 +228,7 @@ class FileParser
     filename = 'School-aged children in poverty.csv'
     read_file(filename).each do |name, rows|
       data = rows.select { |row| row.fetch(:dataformat) == "Percent" }
-                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }
+                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }
                  .sort
                  .to_h
       economic_profile_for(name)[:school_aged_children_in_poverty] = data
@@ -237,22 +238,10 @@ class FileParser
   def parse_title_1_students_by_year
     filename = 'Title I students.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }
                  .sort
                  .to_h
       economic_profile_for(name)[:title_1_students] = data
     end
   end
-
-  ### FLOATS ####################
-    class Float
-      def inspect
-        '%.3f' % self
-      end
-    end
-
-    def truncate(percentage)
-      (percentage.to_f * 1000).to_i / 1000
-    end
-  ####################
 end
