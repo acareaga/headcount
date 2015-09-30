@@ -6,7 +6,6 @@ require 'pry'
 class EnrollmentTest < Minitest::Test
 
   def test_dropout_rate_in_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")

@@ -15,17 +15,18 @@ class Enrollment
   attr_reader :district_data, :name
 
   def initialize(name, district_data)
-    @name = name
-    @district_data = district_data
-    # @dropout_rate_by_year = district_data
-    #   .select { |row| row.fetch(:category) == "All"}
-    #   .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data)]}
+    @dropout_rate_by_year = district_data.select { |hash| hash[:dropout_rates]}[0].values[0]
+    @dropout_rate_by_gender_in_year
   end
 
   def dropout_rate_in_year(year)
     # returns a truncated three-digit floating point number representing a percentage
     # or nil for unknown year
-    @dropout_rate_by_year.values_at(year).pop
+    @dropout_rate_by_year.map { |row| row.select { |row| row = row["All Students"]}}.delete({})
+      .values_at(year).pop
+    binding.pry
+    # .values_at(year).pop
+
   end
 
   def dropout_rate_by_gender_in_year(year)

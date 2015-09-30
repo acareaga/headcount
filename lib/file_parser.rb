@@ -35,6 +35,7 @@ class FileParser
       parse_reading_proficiency
       parse_writing_proficiency
     build_districts(repo_data)
+    binding.pry
   end
 
   #STATEWIDE TESTING FILES -- need to fix select & mapping
@@ -88,16 +89,6 @@ class FileParser
     @repo_data << eighth_grade
   end
 
-  def parse_proficient_by_race_or_ethnicity
-    filename = [ 'Average proficiency on the CSAP_TCAP by race_ethnicity_Math.csv',
-      'Average proficiency on the CSAP_TCAP by race_ethnicity_Reading.csv',
-      'Average proficiency on the CSAP_TCAP by race_ethnicity_Writing.csv' ]
-      .each { |filename| read_file(filename) }
-      .group_by { |name| name[:location] }
-      .select { |row| row.fetch(:race_ethnicity) == "Asian" } # add race/ethnicity functionality so it's dynamic
-      .map { |column| [column.fetch(:timeframe).to_i, Hash[column.fetch(:score).downcase, column.fetch(:data).rjust(5, "0")[0..4].to_f]] }.to_h
-  end
-
   # ENROLLMENT FILES ...
   def parse_dropout_rate
     filename  = ['Dropout rates by race and ethnicity.csv']
@@ -105,6 +96,7 @@ class FileParser
     districts = group_by(repo_data)
     all_dropouts = districts.map { |district, data| district = district, data = data
       .map { |column| Hash[column.fetch(:category), Hash[column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f]] }}
+      .group_by { |category| }
       .map { |key, value| key = key, Hash[:dropout_rates, value] }.to_h
     @repo_data << all_dropouts
   end
@@ -155,9 +147,15 @@ class FileParser
     districts = group_by(repo_data)
     participation_rates = districts.map { |district, data| district = district, data = data
       .select { |row| row = row.fetch(:dataformat) == "Percent"}
-      .map { |column| Hash[column.fetch(:race), Hash[column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f]] }}
-      .map { |key, value| key = key, Hash[:pupil_enrollment_by_race_ethnicity, value] }.to_h
-    @repo_data << participation_rates
+      .group_by { |row| row.fetch(:race) }
+      .map { |key, rows|
+        rows.map { |row|
+          :timeframe # Hash[row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f]
+        }
+        [key, ??]
+      }
+      .to_h
+    @repo_data << { :pupil_enrollment_by_race_ethnicity => participation_rates }
   end
 
   def parse_special_education
