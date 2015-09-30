@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 require 'minitest/pride'
-require './lib/district'
+require_relative 'district'
 require 'pry'
 
 class StatewideTesting
@@ -15,18 +15,22 @@ class StatewideTesting
   def initialize(name, district_data)
     @district_data = district_data
     # zip multiple files together, use data as enumerable??
-
-    @proficient_by_grade = district_data
-      .group_by { |year| year[:timeframe]}
-      # .select { |row| row.fetch(:score) == "Reading" }
-      # .select { |row| row.fetch(:score) == "Writing" }
-      # .select { |row| row.fetch(:score) == "Math" }
-      # .map { |column| [column.fetch(:timeframe).to_i, Hash[column.fetch(:score).downcase, column.fetch(:data).rjust(5, "0")[0..4].to_f]] }.to_h
+    @proficient_by_grade_3 = district_data.fetch(:proficient_by_grade_3)
+    @proficient_by_grade_8 = district_data.fetch(:proficient_by_grade_8)
+    @math_proficiency
+    @reading_proficiency
+    @writing_proficiency
   end
 
 
   def proficient_by_grade(grade)
-    @proficient_by_grade
+    if grade == 3
+      @proficient_by_grade_3
+    elsif grade == 8
+      @proficient_by_grade_8
+    else
+      puts "Unknown Grade Error"
+    end
     # takes grade as an integer from the following set: [3, 8]
     # returns a hash grouped by year referencing percentages by subject all as three digit floats.
     # unknown grade should raise a UnknownDataError
@@ -39,6 +43,13 @@ class StatewideTesting
   end
 
   def proficient_for_subject_by_grade_in_year(subject, grade, year)
+    if grade == 3
+      @proficient_by_grade_3.fetch(subject).values_at(year).pop
+    elsif grade == 8
+      @proficient_by_grade_8.fetch(subject).values_at(year).pop
+    else
+      puts "UnknownDataError"
+    end
     # subject as a symbol from the following set: [:math, :reading, :writing]
     # grade as an integer from the following set: [3, 8]
     # year as an integer for any year reported in the data

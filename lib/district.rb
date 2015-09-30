@@ -1,7 +1,7 @@
-require './lib/district_repository'
-require './lib/economic_profile'
-require './lib/statewide_testing'
-require './lib/enrollment'
+require_relative 'district_repository'
+require_relative 'economic_profile'
+require_relative 'statewide_testing'
+require_relative 'enrollment'
 require 'pry'
 
 class District

@@ -1,8 +1,10 @@
-require './lib/district_repository'
+require_relative 'district_repository'
 require 'csv'
 require 'pry'
 
 class FileParser
+
+  UNRECOGNIZED_DATA = [nil, "LNE", "#VALUE!", "r/n/", "NA"]
   attr_reader :path, :repo_hash, :filename, :data
 
   def initialize(path)
@@ -15,6 +17,12 @@ class FileParser
     fullpath = File.join path, file_name
     rows     = CSV.read(fullpath, headers: true, header_converters: :symbol)
     rows.map(&:to_h).group_by { |row| row.fetch(:location) }
+  end
+
+  def remove_unrecognized_data(rows)
+    rows.each do |row|
+      row.delete_if { UNRECOGNIZED_DATA.include? row.value }
+    end
   end
 
   def file_loader # need to save result as data hash, create district framework below
@@ -35,7 +43,6 @@ class FileParser
     parse_reading_proficiency
     parse_writing_proficiency
     repo_hash
-    binding.pry
   end
 
   def economic_profile_for(name)
@@ -58,13 +65,15 @@ class FileParser
     }
   end
 
+############### STATEWIDE TESTING #############################################
+
   def parse_math_proficiency
     filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Math.csv'
     read_file(filename).each do |name, rows|
       data = rows.group_by { |row| row.fetch(:race_ethnicity) }
                  .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
-                   [race_ethnicity, years_to_percentages]
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
+                   [race_ethnicity.downcase.to_sym, years_to_percentages]
                  }
                  .to_h
       statewide_testing_for(name)[:math_proficiency] = data
@@ -76,8 +85,8 @@ class FileParser
     read_file(filename).each do |name, rows|
       data = rows.group_by { |row| row.fetch(:race_ethnicity) }
                  .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
-                   [race_ethnicity, years_to_percentages]
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
+                   [race_ethnicity.downcase.to_sym, years_to_percentages]
                  }
                  .to_h
       statewide_testing_for(name)[:reading_proficiency] = data
@@ -89,8 +98,8 @@ class FileParser
     read_file(filename).each do |name, rows|
       data = rows.group_by { |row| row.fetch(:race_ethnicity) }
                  .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
-                   [race_ethnicity, years_to_percentages]
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
+                   [race_ethnicity.downcase.to_sym, years_to_percentages]
                  }
                  .to_h
       statewide_testing_for(name)[:writing_proficiency] = data
@@ -104,11 +113,11 @@ class FileParser
                  .map { |subject, rows|
                    percent_by_year = rows.map { |row|
                                            [ row.fetch(:timeframe).to_i,
-                                             row.fetch(:data)[0..4].to_f
+                                             truncate(row.fetch(:data))
                                            ]
                                          }
                                          .to_h
-                   [subject, percent_by_year]
+                   [subject.downcase.to_sym, percent_by_year]
                  }.to_h
       statewide_testing_for(name)[:proficient_by_grade_3] = data
     end
@@ -121,26 +130,27 @@ class FileParser
                  .map { |subject, rows|
                    percent_by_year = rows.map { |row|
                                            [ row.fetch(:timeframe).to_i,
-                                             row.fetch(:data)[0..4].to_f
+                                             truncate(row.fetch(:data))
                                            ]
                                          }
                                          .to_h
-                   [subject, percent_by_year]
+                   [subject.downcase.to_sym, percent_by_year]
                  }.to_h
       statewide_testing_for(name)[:proficient_by_grade_8] = data
     end
   end
 
-  # ENROLLMENT FILES ...
+###################### ENROLLMENT FILES ...#####################################
+
   def parse_dropout_rate
     filename  = 'Dropout rates by race and ethnicity.csv'
     read_file(filename).each do |name, rows|
       data = rows.group_by { |row| row.fetch :category }
       .map { |race, rows|
         percents_by_year = rows.map { |row|
-          [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f]
+          [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))]
         }.to_h
-        [race, percents_by_year]
+        [race.downcase.to_sym, percents_by_year]
       }.to_h
       enrollment_for(name)[:dropout_rates] = data
     end
@@ -149,7 +159,7 @@ class FileParser
   def parse_graduation_rates
     filename  = 'High school graduation rates.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
       enrollment_for(name)[:graduation_rates] = data
     end
   end
@@ -157,7 +167,7 @@ class FileParser
   def parse_kindergarten_participation
     filename  = 'Kindergartners in full-day program.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
       enrollment_for(name)[:kindergarten_participation] = data
     end
   end
@@ -165,7 +175,7 @@ class FileParser
   def parse_online_participation
     filename  = 'Online pupil enrollment.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
       enrollment_for(name)[:online_participation] = data
     end
   end
@@ -185,9 +195,9 @@ class FileParser
                  .group_by { |row| row.fetch(:race) }
                  .map { |race, rows|
                    percent_by_year = rows.map { |row|
-                     [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f]
+                     [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))]
                    }.to_h
-                   [race, percent_by_year]
+                   [race.downcase.to_sym, percent_by_year]
                  }
                  .to_h
       enrollment_for(name)[:pupil_enrollment_by_race_ethnicity] = data
@@ -198,7 +208,7 @@ class FileParser
     filename  = 'Special education.csv'
     read_file(filename).each do |name, rows|
       data = rows.select { |row| row.fetch(:dataformat) == 'Percent' }
-                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }
+                 .map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }
                  .to_h
       enrollment_for(name)[:special_education] = data
     end
@@ -207,17 +217,18 @@ class FileParser
   def parse_remediation
     filename  = 'Remediation in higher education.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
       enrollment_for(name)[:remediation] = data
     end
   end
 
-  # ECONOMIC PROFILE FILES -- finished migration, need to test
+################ ECONOMIC PROFILE FILES -- finished migration, need to test ############################
+
   def parse_free_or_reduced_lunch_by_year
     filename = 'Students qualifying for free or reduced price lunch.csv'
     read_file(filename).each do |name, rows|
       data = rows.select { |row| row.fetch(:dataformat) == "Percent" && row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
-                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }
+                 .map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }
                  .sort
                  .to_h
       economic_profile_for(name)[:free_or_reduced_lunch] = data
@@ -228,7 +239,7 @@ class FileParser
     filename = 'School-aged children in poverty.csv'
     read_file(filename).each do |name, rows|
       data = rows.select { |row| row.fetch(:dataformat) == "Percent" }
-                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }
+                 .map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }
                  .sort
                  .to_h
       economic_profile_for(name)[:school_aged_children_in_poverty] = data
@@ -238,10 +249,14 @@ class FileParser
   def parse_title_1_students_by_year
     filename = 'Title I students.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data)[0..4].to_f] }
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }
                  .sort
                  .to_h
       economic_profile_for(name)[:title_1_students] = data
     end
+  end
+
+  def truncate(percentage)
+    percentage[0..4].to_f
   end
 end

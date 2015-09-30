@@ -1,10 +1,11 @@
 require 'csv'
 require 'pry'
-require './lib/file_parser'
+require_relative 'file_parser'
+require_relative 'district'
 
 class DistrictRepository
 
-  attr_reader :district, :districts_by_name
+  attr_reader :district, :districts_by_name, :name
 
   def initialize(districts_data)
     @districts_by_name = districts_data.map { |name, district_data|
@@ -19,7 +20,7 @@ class DistrictRepository
   end
 
   def find_all_matching(fragment)
-    @districts_by_name.select { |name, district_data| name.include?(fragment.upcase) }
+    @districts_by_name.select { |name, district_data| name.include?(fragment.upcase) }.keys
     # recieves a String
     # returns either [] or one or more matches which contain the supplied name fragment, case insensitive
   end

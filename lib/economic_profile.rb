@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'minitest/pride'
-require './lib/district'
-require './lib/file_parser'
+require_relative 'district'
+require_relative 'file_parser'
 require 'pry'
 
 class EconomicProfile
