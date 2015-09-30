@@ -145,16 +145,19 @@ class FileParser
     filename  = ['Pupil enrollment by race_ethnicity.csv']
     repo_data = read_file(filename)
     districts = group_by(repo_data)
-    participation_rates = districts.map { |district, data| district = district, data = data
-      .select { |row| row = row.fetch(:dataformat) == "Percent"}
-      .group_by { |row| row.fetch(:race) }
-      .map { |key, rows|
-        rows.map { |row|
-          :timeframe # Hash[row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f]
+    participation_rates = districts.map { |district, data|
+      data = data
+        .select { |row| row.fetch(:dataformat) == "Percent" }
+        .group_by { |row| row.fetch(:race) }
+        .map { |race, rows|
+          enrollment_by_year = rows.map { |row|
+             [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f]
+          }.to_h
+          [race, enrollment_by_year]
         }
-        [key, ??]
-      }
-      .to_h
+        .to_h
+      [district, data]
+    }.to_h
     @repo_data << { :pupil_enrollment_by_race_ethnicity => participation_rates }
   end
 
@@ -213,20 +216,17 @@ class FileParser
     @repo_data << percent
   end
 
-  def build_districts(array)
-    keys = []
+  def build_districts(repo_data)
     result = {}
+    keys = repo_data.map { |data_by_district| data_by_district.keys }.flatten.uniq
+    keys.each { |key| result[key] = {} }
 
-    array.each do |district|
-      keys += district.keys
-    end
-
-    keys.uniq.each do |key|
-      result[key] = []
-      array.each do |district|
-        result[key] << district[key]
+    repo_data.each do |data_by_district|
+      data_by_district.each do |district_name, district_data|
+        result[district_name].merge! district_data
       end
     end
+
     result
   end
 
