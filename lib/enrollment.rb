@@ -58,7 +58,7 @@ class Enrollment
     # returns a hash with years as keys and a three-digit floating
     race = race.to_s + " students"
     dropout_rate_by_year[race.to_sym]
-  end
+  end   
 
   def dropout_rate_for_race_or_ethnicity_in_year(race, year)
     # returns a truncated three-digit floating point number representing a percentage
