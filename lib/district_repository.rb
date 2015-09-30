@@ -9,7 +9,7 @@ class DistrictRepository
   def initialize(districts_data)
     @districts_by_name = districts_data.map { |name, district_data|
       [name.upcase, District.new(name, district_data)]
-      }.to_h
+    }.to_h
   end
 
   def find_by_name(name)

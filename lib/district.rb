@@ -13,17 +13,17 @@ class District
   end
 
   def economic_profile
-    EconomicProfile.new(name, district_data)
+    EconomicProfile.new(name, district_data.fetch(:economic_profile))
     # returns a new instance of the economic_profile class
   end
 
   def statewide_testing
-    StatewideTesting.new(name, district_data)
+    StatewideTesting.new(name, district_data.fetch(:statewide_testing))
     # returns a new instance of the statewide_testing class
   end
 
   def enrollment
-    Enrollment.new(name, district_data)
+    Enrollment.new(name, district_data.fetch(:enrollment))
     # returns a new instance of the enrollement class
   end
 end

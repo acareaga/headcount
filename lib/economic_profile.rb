@@ -14,9 +14,9 @@ class EconomicProfile
   attr_reader :district_data, :name
 
   def initialize(name, district_data)
-    @free_or_reduced_lunch_by_year = district_data.select { |hash| hash[:free_or_reduced_lunch] }[0].values[0]
-    @school_aged_children_in_poverty_by_year = district_data.select { |hash| hash[:school_aged_children_in_poverty] }[0].values[0]
-    @title_1_students_by_year = district_data.select { |hash| hash[:title_1_students] }[0].values[0]
+    @free_or_reduced_lunch_by_year = district_data.fetch(:free_or_reduced_lunch)
+    @school_aged_children_in_poverty_by_year = district_data.fetch(:school_aged_children_in_poverty)
+    @title_1_students_by_year = district_data.fetch(:title_1_students)
   end
 
   def free_or_reduced_lunch_in_year(year)

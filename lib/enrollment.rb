@@ -12,21 +12,18 @@ class Enrollment
     # Special education.csv
     # Remediation in higher education.csv
 
-  attr_reader :district_data, :name
+  attr_reader :district_data, :name, :dropout_rate_by_year
 
-  def initialize(name, district_data)
-    @dropout_rate_by_year = district_data.select { |hash| hash[:dropout_rates]}[0].values[0]
+  def initialize(name, enrollment_data)
+    @dropout_rate_by_year = enrollment_data.fetch(:dropout_rates)
     @dropout_rate_by_gender_in_year
   end
 
   def dropout_rate_in_year(year)
     # returns a truncated three-digit floating point number representing a percentage
     # or nil for unknown year
-    @dropout_rate_by_year.map { |row| row.select { |row| row = row["All Students"]}}.delete({})
-      .values_at(year).pop
-    binding.pry
-    # .values_at(year).pop
 
+    dropout_rate_by_year['All Students'][year] # FIXME :D
   end
 
   def dropout_rate_by_gender_in_year(year)

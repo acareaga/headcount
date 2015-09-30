@@ -3,235 +3,245 @@ require 'csv'
 require 'pry'
 
 class FileParser
-  attr_reader :path, :repo_data, :filename, :data
+  attr_reader :path, :repo_hash, :filename, :data
 
   def initialize(path)
-    @path = path
-    @repo_data = repo_data
-    @filename = filename
+    @path      = path
+    @filename  = filename
+    @repo_hash = {}
   end
 
   def read_file(file_name) # joins path and reads file
-    fullpath  = File.join path, file_name
-    repo_data = CSV.read(fullpath, headers: true, header_converters: :symbol).map(&:to_h)
+    fullpath = File.join path, file_name
+    rows     = CSV.read(fullpath, headers: true, header_converters: :symbol)
+    rows.map(&:to_h).group_by { |row| row.fetch(:location) }
   end
 
   def file_loader # need to save result as data hash, create district framework below
-    @repo_data = []
-      parse_free_or_reduced_lunch_by_year
-      parse_school_aged_children_in_poverty_by_year
-      parse_title_1_students_by_year
-      parse_dropout_rate
-      parse_graduation_rates
-      parse_kindergarten_participation
-      parse_online_participation
-      parse_pupil_enrollment
-      parse_pupil_enrollment_by_race_ethnicity
-      parse_special_education
-      parse_remediation
-      parse_proficient_by_grade_3
-      parse_proficient_by_grade_8
-      parse_math_proficiency
-      parse_reading_proficiency
-      parse_writing_proficiency
-    build_districts(repo_data)
-    binding.pry
+    parse_free_or_reduced_lunch_by_year
+    parse_school_aged_children_in_poverty_by_year
+    parse_title_1_students_by_year
+    parse_dropout_rate
+    parse_graduation_rates
+    parse_kindergarten_participation
+    parse_online_participation
+    parse_pupil_enrollment
+    parse_pupil_enrollment_by_race_ethnicity
+    parse_special_education
+    parse_remediation
+    parse_proficient_by_grade_3
+    parse_proficient_by_grade_8
+    parse_math_proficiency
+    parse_reading_proficiency
+    parse_writing_proficiency
+    repo_hash
   end
 
-  #STATEWIDE TESTING FILES -- need to fix select & mapping
+  def economic_profile_for(name)
+    ensure_name(name)[:economic_profile]
+  end
+
+  def statewide_testing_for(name)
+    ensure_name(name)[:statewide_testing]
+  end
+
+  def enrollment_for(name)
+    ensure_name(name)[:enrollment]
+  end
+
+  def ensure_name(name)
+    repo_hash[name.upcase] ||= {
+      economic_profile:  {},
+      statewide_testing: {},
+      enrollment:        {},
+    }
+  end
+
   def parse_math_proficiency
-    filename = [ 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Math.csv' ]
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    math = districts.map { |district, data| district = district, data = data
-      .map { |column| Hash[column.fetch(:race_ethnicity), Hash[column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] ] } }
-      .map { |key, value| key = key, Hash[:math_proficiency, value] }.to_h
-    @repo_data << math
+    filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Math.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch(:race_ethnicity) }
+                 .map { |race_ethnicity, rows|
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+                   [race_ethnicity, years_to_percentages]
+                 }
+                 .to_h
+      statewide_testing_for(name)[:math_proficiency] = data
+    end
   end
 
   def parse_reading_proficiency
-    filename = [ 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Reading.csv' ]
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    reading = districts.map { |district, data| district = district, data = data
-      .map { |column| Hash[column.fetch(:race_ethnicity), Hash[column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] ] } }
-      .map { |key, value| key = key, Hash[:reading_proficiency, value] }.to_h
-    @repo_data << reading
+    filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Reading.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch(:race_ethnicity) }
+                 .map { |race_ethnicity, rows|
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+                   [race_ethnicity, years_to_percentages]
+                 }
+                 .to_h
+      statewide_testing_for(name)[:reading_proficiency] = data
+    end
   end
 
   def parse_writing_proficiency
-    filename = [ 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Writing.csv' ]
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    writing = districts.map { |district, data| district = district, data = data
-      .map { |column| Hash[column.fetch(:race_ethnicity), Hash[column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] ] } }
-      .map { |key, value| key = key, Hash[:writing_proficiency, value] }.to_h
-    @repo_data << writing
+    filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Writing.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch(:race_ethnicity) }
+                 .map { |race_ethnicity, rows|
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+                   [race_ethnicity, years_to_percentages]
+                 }
+                 .to_h
+      statewide_testing_for(name)[:writing_proficiency] = data
+    end
   end
 
   def parse_proficient_by_grade_3
-    filename = [ '3rd grade students scoring proficient or above on the CSAP_TCAP.csv' ]
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    third_grade = districts.map { |district, data| district = district, data = data
-      .map { |column| Hash[column.fetch(:score), Hash[column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] ] } }
-      .map { |key, value| key = key, Hash[:proficient_by_grade_3, value] }.to_h
-    @repo_data << third_grade
+    filename = '3rd grade students scoring proficient or above on the CSAP_TCAP.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch(:score) }
+                 .map { |subject, rows|
+                   percent_by_year = rows.map { |row|
+                                           [ row.fetch(:timeframe).to_i,
+                                             row.fetch(:data).rjust(5, "0")[0..4].to_f
+                                           ]
+                                         }
+                                         .to_h
+                   [subject, percent_by_year]
+                 }.to_h
+      statewide_testing_for(name)[:proficient_by_grade_3] = data
+    end
   end
 
   def parse_proficient_by_grade_8
-    filename = [ '8th grade students scoring proficient or above on the CSAP_TCAP.csv' ]
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    eighth_grade = districts.map { |district, data| district = district, data = data
-      .map { |column| Hash[column.fetch(:score), Hash[column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] ] } }
-      .map { |key, value| key = key, Hash[:proficient_by_grade_8, value] }.to_h
-    @repo_data << eighth_grade
+    filename = '8th grade students scoring proficient or above on the CSAP_TCAP.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch(:score) }
+                 .map { |subject, rows|
+                   percent_by_year = rows.map { |row|
+                                           [ row.fetch(:timeframe).to_i,
+                                             row.fetch(:data).rjust(5, "0")[0..4].to_f
+                                           ]
+                                         }
+                                         .to_h
+                   [subject, percent_by_year]
+                 }.to_h
+      statewide_testing_for(name)[:proficient_by_grade_8] = data
+    end
   end
 
   # ENROLLMENT FILES ...
   def parse_dropout_rate
-    filename  = ['Dropout rates by race and ethnicity.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    all_dropouts = districts.map { |district, data| district = district, data = data
-      .map { |column| Hash[column.fetch(:category), Hash[column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f]] }}
-      .group_by { |category| }
-      .map { |key, value| key = key, Hash[:dropout_rates, value] }.to_h
-    @repo_data << all_dropouts
+    filename  = 'Dropout rates by race and ethnicity.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch :category }
+      .map { |race, rows|
+        percents_by_year = rows.map { |row|
+          [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f]
+        }.to_h
+        [race, percents_by_year]
+      }.to_h
+      enrollment_for(name)[:dropout_rates] = data
+    end
   end
 
   def parse_graduation_rates
-    filename  = ['High school graduation rates.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    grad_rates = districts.map { |district, data| district = district, data = data
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:graduation_rates, value] }.to_h
-    @repo_data << grad_rates
+    filename  = 'High school graduation rates.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+      enrollment_for(name)[:graduation_rates] = data
+    end
   end
 
   def parse_kindergarten_participation
-    filename  = ['Kindergartners in full-day program.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    participation_rates = districts.map { |district, data| district = district, data = data
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:kindergarten_participation, value] }.to_h
-    @repo_data << participation_rates
+    filename  = 'Kindergartners in full-day program.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+      enrollment_for(name)[:kindergarten_participation] = data
+    end
   end
 
   def parse_online_participation
-    filename  = ['Online pupil enrollment.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    participation_rates = districts.map { |district, data| district = district, data = data
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).to_i] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:online_participation, value] }.to_h
-    @repo_data << participation_rates
+    filename  = 'Online pupil enrollment.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+      enrollment_for(name)[:online_participation] = data
+    end
   end
 
   def parse_pupil_enrollment
-    filename  = ['Pupil enrollment.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    participation_rates = districts.map { |district, data| district = district, data = data
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).to_i] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:pupil_enrollment, value] }.to_h
-    @repo_data << participation_rates
+    filename  = 'Pupil enrollment.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).to_i] }.to_h
+      enrollment_for(name)[:pupil_enrollment] = data
+    end
   end
 
   def parse_pupil_enrollment_by_race_ethnicity
-    filename  = ['Pupil enrollment by race_ethnicity.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    participation_rates = districts.map { |district, data|
-      data = data
-        .select { |row| row.fetch(:dataformat) == "Percent" }
-        .group_by { |row| row.fetch(:race) }
-        .map { |race, rows|
-          enrollment_by_year = rows.map { |row|
-             [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f]
-          }.to_h
-          [race, enrollment_by_year]
-        }
-        .to_h
-      [district, data]
-    }.to_h
-    @repo_data << { :pupil_enrollment_by_race_ethnicity => participation_rates }
+    filename  = 'Pupil enrollment by race_ethnicity.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.select { |row| row.fetch(:dataformat) == "Percent" }
+                 .group_by { |row| row.fetch(:race) }
+                 .map { |race, rows|
+                   percent_by_year = rows.map { |row|
+                     [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f]
+                   }.to_h
+                   [race, percent_by_year]
+                 }
+                 .to_h
+      enrollment_for(name)[:pupil_enrollment_by_race_ethnicity] = data
+    end
   end
 
   def parse_special_education
-    filename  = ['Special education.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    special_education = districts.map { |district, data| district = district, data = data
-      .select { |row| row = row.fetch(:dataformat) == "Percent"}
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:special_education, value] }.to_h
-    @repo_data << special_education
+    filename  = 'Special education.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.select { |row| row.fetch(:dataformat) == 'Percent' }
+                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }
+                 .to_h
+      enrollment_for(name)[:special_education] = data
+    end
   end
 
   def parse_remediation
-    filename  = ['Remediation in higher education.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    remediation = districts.map { |district, data| district = district, data = data
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:remediation, value] }.to_h
-    @repo_data << remediation
+    filename  = 'Remediation in higher education.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }.to_h
+      enrollment_for(name)[:remediation] = data
+    end
   end
 
   # ECONOMIC PROFILE FILES -- finished migration, need to test
   def parse_free_or_reduced_lunch_by_year
-    filename  = ['Students qualifying for free or reduced price lunch.csv']
-    repo_data = read_file(filename)
-    districts = group_by(repo_data)
-    percent   = districts.map { |district, data| district = district, data = data
-      .select { |row| row = row.fetch(:dataformat) == "Percent" && row = row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:free_or_reduced_lunch, value] }.to_h
-    @repo_data << percent
+    filename = 'Students qualifying for free or reduced price lunch.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.select { |row| row.fetch(:dataformat) == "Percent" && row.fetch(:poverty_level) == "Eligible for Free or Reduced Lunch" }
+                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }
+                 .sort
+                 .to_h
+      economic_profile_for(name)[:free_or_reduced_lunch] = data
+    end
   end
 
   def parse_school_aged_children_in_poverty_by_year
-    filename       = [ 'School-aged children in poverty.csv' ]
-    repo_data      = read_file(filename)
-    h = group_by(repo_data)
-    percent = h.map { |district, data| district = district, data = data
-      .select { |row| row = row.fetch(:dataformat) == "Percent" }
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:school_aged_children_in_poverty, value] }.to_h
-    @repo_data << percent
+    filename = 'School-aged children in poverty.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.select { |row| row.fetch(:dataformat) == "Percent" }
+                 .map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }
+                 .sort
+                 .to_h
+      economic_profile_for(name)[:school_aged_children_in_poverty] = data
+    end
   end
 
   def parse_title_1_students_by_year
-    filename  = [ 'Title I students.csv' ]
-    repo_data = read_file(filename)
-    h = group_by(repo_data)
-    percent = h.map { |district, data| district = district, data = data
-      .select { |row| row = row.fetch(:dataformat) == "Percent" }
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data).rjust(5, "0")[0..4].to_f] }.sort.to_h }
-      .map { |key, value| key = key, Hash[:title_1_students, value] }.to_h
-    @repo_data << percent
-  end
-
-  def build_districts(repo_data)
-    result = {}
-    keys = repo_data.map { |data_by_district| data_by_district.keys }.flatten.uniq
-    keys.each { |key| result[key] = {} }
-
-    repo_data.each do |data_by_district|
-      data_by_district.each do |district_name, district_data|
-        result[district_name].merge! district_data
-      end
+    filename = 'Title I students.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).rjust(5, "0")[0..4].to_f] }
+                 .sort
+                 .to_h
+      economic_profile_for(name)[:title_1_students] = data
     end
-
-    result
-  end
-
-  def group_by(repo_data)
-    repo_data.group_by { |name| name[:location].upcase }
   end
 
   ### FLOATS ####################
