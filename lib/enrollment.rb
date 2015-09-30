@@ -17,9 +17,9 @@ class Enrollment
   def initialize(name, district_data)
     @name = name
     @district_data = district_data
-    @dropout_rate_by_year = district_data
-      .select { |row| row.fetch(:category) == "All"}
-      .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data)]}
+    # @dropout_rate_by_year = district_data
+    #   .select { |row| row.fetch(:category) == "All"}
+    #   .map { |column| [column.fetch(:timeframe).to_i, column.fetch(:data)]}
   end
 
   def dropout_rate_in_year(year)
