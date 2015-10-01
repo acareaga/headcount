@@ -13,13 +13,11 @@ class StatewideTesting
   attr_reader :district_data, :name
 
   def initialize(name, district_data)
-    @district_data = district_data
-    # zip multiple files together, use data as enumerable??
     @proficient_by_grade_3 = district_data.fetch(:proficient_by_grade_3)
     @proficient_by_grade_8 = district_data.fetch(:proficient_by_grade_8)
-    @math_proficiency
-    @reading_proficiency
-    @writing_proficiency
+    @math_proficiency = district_data.fetch(:math_proficiency)
+    @reading_proficiency = district_data.fetch(:reading_proficiency)
+    @writing_proficiency = district_data.fetch(:writing_proficiency)
   end
 
 
@@ -44,9 +42,9 @@ class StatewideTesting
 
   def proficient_for_subject_by_grade_in_year(subject, grade, year)
     if grade == 3
-      @proficient_by_grade_3.fetch(subject).values_at(year).pop
+      @proficient_by_grade_3.values_at(year).pop.fetch(subject)
     elsif grade == 8
-      @proficient_by_grade_8.fetch(subject).values_at(year).pop
+      @proficient_by_grade_8.values_at(year).pop.fetch(subject)
     else
       puts "UnknownDataError"
     end
@@ -58,6 +56,11 @@ class StatewideTesting
   end
 
   def proficient_for_subject_by_race_in_year(subject, race, year)
+    @math_proficiency.fetch(year).values_at(race).pop if subject == :math
+    @reading_proficiency.fetch(year).values_at(race).pop if subject == :reading
+    @writing_proficiency.fetch(year).values_at(race).pop if subject == :writing
+    else
+      puts "UnknownDataError"
     # subject as a symbol from the following set: [:math, :reading, :writing]
     # race as a symbol from the following set: [:asian, :black, :pacific_islander, :hispanic, :native_american, :two_or_more, :white]
     # year as an integer for any year reported in the data

@@ -70,10 +70,10 @@ class FileParser
   def parse_math_proficiency
     filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Math.csv'
     read_file(filename).each do |name, rows|
-      data = rows.group_by { |row| row.fetch(:race_ethnicity) }
-                 .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
-                   [race_ethnicity.downcase.to_sym, years_to_percentages]
+      data = rows.group_by { |row| row.fetch(:timeframe).to_i }
+                 .map { |year, rows|
+                   subjects_to_percentages = rows.map { |row| [row.fetch(:race_ethnicity).downcase.gsub(' ','_').to_sym, truncate(row.fetch(:data))] }.to_h
+                   [year, subjects_to_percentages]
                  }
                  .to_h
       statewide_testing_for(name)[:math_proficiency] = data
@@ -83,10 +83,10 @@ class FileParser
   def parse_reading_proficiency
     filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Reading.csv'
     read_file(filename).each do |name, rows|
-      data = rows.group_by { |row| row.fetch(:race_ethnicity) }
-                 .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
-                   [race_ethnicity.downcase.to_sym, years_to_percentages]
+      data = rows.group_by { |row| row.fetch(:timeframe).to_i }
+                 .map { |year, rows|
+                   subjects_to_percentages = rows.map { |row| [row.fetch(:race_ethnicity).downcase.gsub(' ','_').to_sym, truncate(row.fetch(:data))] }.to_h
+                   [year, subjects_to_percentages]
                  }
                  .to_h
       statewide_testing_for(name)[:reading_proficiency] = data
@@ -96,10 +96,10 @@ class FileParser
   def parse_writing_proficiency
     filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Writing.csv'
     read_file(filename).each do |name, rows|
-      data = rows.group_by { |row| row.fetch(:race_ethnicity) }
-                 .map { |race_ethnicity, rows|
-                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
-                   [race_ethnicity.downcase.to_sym, years_to_percentages]
+      data = rows.group_by { |row| row.fetch(:timeframe).to_i }
+                 .map { |year, rows|
+                   subjects_to_percentages = rows.map { |row| [row.fetch(:race_ethnicity).downcase.gsub(' ','_').to_sym, truncate(row.fetch(:data))] }.to_h
+                   [year, subjects_to_percentages]
                  }
                  .to_h
       statewide_testing_for(name)[:writing_proficiency] = data
@@ -109,15 +109,15 @@ class FileParser
   def parse_proficient_by_grade_3
     filename = '3rd grade students scoring proficient or above on the CSAP_TCAP.csv'
     read_file(filename).each do |name, rows|
-      data = rows.group_by { |row| row.fetch(:score) }
-                 .map { |subject, rows|
-                   percent_by_year = rows.map { |row|
-                                           [ row.fetch(:timeframe).to_i,
+      data = rows.group_by { |row| row.fetch(:timeframe).to_i }
+                 .map { |year, rows|
+                   percent_by_subject = rows.map { |row|
+                                           [ row.fetch(:score).downcase.to_sym,
                                              truncate(row.fetch(:data))
                                            ]
                                          }
                                          .to_h
-                   [subject.downcase.to_sym, percent_by_year]
+                   [year, percent_by_subject]
                  }.to_h
       statewide_testing_for(name)[:proficient_by_grade_3] = data
     end
@@ -126,15 +126,15 @@ class FileParser
   def parse_proficient_by_grade_8
     filename = '8th grade students scoring proficient or above on the CSAP_TCAP.csv'
     read_file(filename).each do |name, rows|
-      data = rows.group_by { |row| row.fetch(:score) }
-                 .map { |subject, rows|
-                   percent_by_year = rows.map { |row|
-                                           [ row.fetch(:timeframe).to_i,
+      data = rows.group_by { |row| row.fetch(:timeframe).to_i }
+                 .map { |year, rows|
+                   percent_by_subject = rows.map { |row|
+                                           [ row.fetch(:score).downcase.to_sym,
                                              truncate(row.fetch(:data))
                                            ]
                                          }
                                          .to_h
-                   [subject.downcase.to_sym, percent_by_year]
+                   [year, percent_by_subject]
                  }.to_h
       statewide_testing_for(name)[:proficient_by_grade_8] = data
     end
