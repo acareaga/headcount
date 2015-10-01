@@ -18,7 +18,7 @@ class EnrollmentTest < Minitest::Test
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
 
-    assert_equal h = {:female => 0.002, :male => 0.002}, district.enrollment.dropout_rate_by_gender_in_year(2011)
+    assert_equal({:female => 0.002, :male => 0.002}, district.enrollment.dropout_rate_by_gender_in_year(2011))
   end
 
   def test_dropout_rate_by_race_in_year
@@ -26,13 +26,13 @@ class EnrollmentTest < Minitest::Test
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
 
-    assert_equal h = {:asian => 0,
-                      :black => 0,
-                      :hispanic => 0.004,
-                      :white => 0.002,
-                      :native_american => 0,
-                      :pacific_islander=> 0,
-                      :two_or_more=> 0 }, district.enrollment.dropout_rate_by_race_in_year(2011)
+    assert_equal( {:asian => 0,
+                   :black => 0,
+                   :hispanic => 0.004,
+                   :white => 0.002,
+                   :native_american => 0,
+                   :pacific_islander=> 0,
+                   :two_or_more=> 0 }, district.enrollment.dropout_rate_by_race_in_year(2011))
   end
 
   def test_dropout_rate_for_race_or_ethnicity
@@ -40,7 +40,7 @@ class EnrollmentTest < Minitest::Test
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
 
-    assert_equal h = {2011 => 0, 2012 => 0.007}, district.enrollment.dropout_rate_for_race_or_ethnicity(:asian)
+    assert_equal({2011 => 0, 2012 => 0.007}, district.enrollment.dropout_rate_for_race_or_ethnicity(:asian))
   end
 
   def test_dropout_rate_for_race_or_ethnicity_in_year

@@ -42,6 +42,9 @@ class FileParser
     parse_math_proficiency
     parse_reading_proficiency
     parse_writing_proficiency
+    parse_math_proficiency_by_race
+    parse_reading_proficiency_by_race
+    parse_writing_proficiency_by_race
     repo_hash
   end
 
@@ -80,6 +83,19 @@ class FileParser
     end
   end
 
+  def parse_math_proficiency_by_race
+    filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Math.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch(:race_ethnicity).downcase.gsub(' ','_').to_sym }
+                 .map { |race, rows|
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
+                   [race, years_to_percentages]
+                 }
+                 .to_h
+      statewide_testing_for(name)[:math_proficiency_by_race] = data
+    end
+  end
+
   def parse_reading_proficiency
     filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Reading.csv'
     read_file(filename).each do |name, rows|
@@ -93,6 +109,19 @@ class FileParser
     end
   end
 
+  def parse_reading_proficiency_by_race
+    filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Reading.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch(:race_ethnicity).downcase.gsub(' ','_').to_sym }
+                 .map { |race, rows|
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
+                   [race, years_to_percentages]
+                 }
+                 .to_h
+      statewide_testing_for(name)[:reading_proficiency_by_race] = data
+    end
+  end
+
   def parse_writing_proficiency
     filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Writing.csv'
     read_file(filename).each do |name, rows|
@@ -103,6 +132,19 @@ class FileParser
                  }
                  .to_h
       statewide_testing_for(name)[:writing_proficiency] = data
+    end
+  end
+
+  def parse_writing_proficiency_by_race
+    filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Writing.csv'
+    read_file(filename).each do |name, rows|
+      data = rows.group_by { |row| row.fetch(:race_ethnicity).downcase.gsub(' ','_').to_sym }
+                 .map { |race, rows|
+                   years_to_percentages = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
+                   [race, years_to_percentages]
+                 }
+                 .to_h
+      statewide_testing_for(name)[:writing_proficiency_by_race] = data
     end
   end
 
