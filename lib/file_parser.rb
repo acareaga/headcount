@@ -1,11 +1,11 @@
 require_relative 'district_repository'
 require 'csv'
-require 'pry'
 
 class FileParser
 
-  UNRECOGNIZED_DATA = ["LNE", "#VALUE!", "r/n/", "NA", nil]
   attr_reader :path, :repo_hash, :filename, :data
+
+  UNRECOGNIZED_DATA = ["LNE", "#VALUE!", "r/n/", "NA", nil]
 
   def initialize(path)
     @path      = path
@@ -13,7 +13,7 @@ class FileParser
     @repo_hash = {}
   end
 
-  def read_file(file_name) # joins path and reads file
+  def read_file(file_name)
     fullpath = File.join path, file_name
     rows     = CSV.read(fullpath, headers: true, header_converters: :symbol)
     rows.map(&:to_h)
@@ -24,7 +24,7 @@ class FileParser
       rows.reject { |row| row.value == UNRECOGNIZED_DATA }
   end
 
-  def file_loader # need to save result as data hash, create district framework below
+  def file_loader
     parse_free_or_reduced_lunch_by_year
     parse_school_aged_children_in_poverty_by_year
     parse_title_1_students_by_year
@@ -66,8 +66,6 @@ class FileParser
       enrollment:        {},
     }
   end
-
-############### STATEWIDE TESTING #############################################
 
   def parse_math_proficiency
     filename = 'Average proficiency on the CSAP_TCAP by race_ethnicity_ Math.csv'
@@ -181,8 +179,6 @@ class FileParser
     end
   end
 
-###################### ENROLLMENT FILES ...#####################################
-
   def parse_dropout_rate
     filename  = 'Dropout rates by race and ethnicity.csv'
     read_file(filename).each do |name, rows|
@@ -262,8 +258,6 @@ class FileParser
       enrollment_for(name)[:remediation] = data
     end
   end
-
-################ ECONOMIC PROFILE FILES -- finished migration, need to test ############################
 
   def parse_free_or_reduced_lunch_by_year
     filename = 'Students qualifying for free or reduced price lunch.csv'

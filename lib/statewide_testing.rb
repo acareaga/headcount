@@ -2,7 +2,6 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require_relative 'district'
 require_relative 'formatting'
-require 'pry'
 
 class StatewideTesting
 
@@ -18,7 +17,6 @@ class StatewideTesting
     @writing_proficiency = district_data.fetch(:writing_proficiency)
     @writing_proficiency_by_race = district_data.fetch(:writing_proficiency_by_race)
   end
-
 
   def proficient_by_grade(grade)
     if grade == 3
@@ -76,5 +74,4 @@ class StatewideTesting
       UnknownDataError
     end
   end
-
 end

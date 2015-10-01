@@ -1,7 +1,6 @@
 require 'minitest/autorun'
 require 'minitest/pride'
 require './lib/economic_profile'
-require 'pry'
 
 class EconomicProfileTest < Minitest::Test
 
@@ -81,7 +80,7 @@ class EconomicProfileTest < Minitest::Test
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district = repository.find_by_name("ACADEMY 20")
-    
+
     assert_equal nil, district.economic_profile.title_1_students_in_year(2313)
   end
 end

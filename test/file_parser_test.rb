@@ -1,6 +1,5 @@
 require 'minitest/autorun'
 require 'minitest/pride'
-require 'pry'
 
 class FileParserTest < Minitest::Test
 
@@ -28,5 +27,4 @@ class FileParserTest < Minitest::Test
 
     assert_equal hash = 0.328, district.economic_profile.school_aged_children_in_poverty_in_year(2012)
   end
-
 end

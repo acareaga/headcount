@@ -2,7 +2,6 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require './lib/district_repository'
 require 'csv'
-require 'pry'
 
 class DistrictRepositoryTest < Minitest::Test
   def test_district_repo_class_exists
