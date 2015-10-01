@@ -175,7 +175,7 @@ class FileParser
   def parse_online_participation
     filename  = 'Online pupil enrollment.csv'
     read_file(filename).each do |name, rows|
-      data = rows.map { |row| [row.fetch(:timeframe).to_i, truncate(row.fetch(:data))] }.to_h
+      data = rows.map { |row| [row.fetch(:timeframe).to_i, row.fetch(:data).to_i] }.to_h
       enrollment_for(name)[:online_participation] = data
     end
   end

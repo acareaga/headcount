@@ -16,7 +16,7 @@ class Enrollment
 
   def initialize(name, enrollment_data)
     @dropout_rate_by_year = enrollment_data.fetch(:dropout_rates)
-    @dropout_rate_by_gender_in_year
+    @graduation_rates = enrollment_data.fetch(:graduation_rates)
     @participation_by_year = enrollment_data.fetch(:pupil_enrollment)
     @kindergarten_participation = enrollment_data.fetch(:kindergarten_participation)
     @online_participation = enrollment_data.fetch(:online_participation)
@@ -58,37 +58,44 @@ class Enrollment
     # returns a hash with years as keys and a three-digit floating
     race = race.to_s + " students"
     dropout_rate_by_year[race.to_sym]
-  end   
+  end
 
   def dropout_rate_for_race_or_ethnicity_in_year(race, year)
     # returns a truncated three-digit floating point number representing a percentage
     # or nil
+    dropout_rate_by_race_in_year(year)[race]
   end
 
   def graduation_rate_by_year
     # returns a hash with years as keys and a truncated three-digit floating point number representing a percentage.
+    @graduation_rates
   end
 
   def graduation_rate_in_year(year)
     # returns a truncated three-digit floating point number representing a percentage.
     # or nil
+    @graduation_rates.values_at(year).pop
   end
 
   def kindergarten_participation_by_year
     # returns a hash with years as keys and a truncated three-digit floating point number representing a percentage
+    @kindergarten_participation
   end
 
   def kindergarten_participation_in_year(year)
     # returns a truncated three-digit floating point number representing a percentage.
     # or nil
+    @kindergarten_participation.values_at(year).pop
   end
 
   def online_participation_by_year
     # returns a hash with years as keys and an integer as the value
+    @online_participation
   end
 
   def online_participation_in_year(year)
     # takes integer year, returns interger or nil for unknown year
+    @online_participation.values_at(year).pop
   end
 
   def participation_by_year
@@ -102,7 +109,8 @@ class Enrollment
   end
 
   def participation_by_race_or_ethnicity(race)
-    @participation_by_race_or_ethnicity.fetch(race)
+    race = race.to_s + " students"
+    @pupil_enrollment_by_race_ethnicity[race.to_sym]
     # takes race as a symbol from the following set: [:asian, :black, :pacific_islander, :hispanic, :native_american, :two_or_more, :white]
     # returns a hash with years as keys and a three-digit floating point number representing a percentage
     # or UnknownRaceError
@@ -110,6 +118,7 @@ class Enrollment
 
   def participation_by_race_or_ethnicity_in_year(year)
     # returns a hash with race markers as keys and a three-digit floating point number representing a percentage.
+    @pupil_enrollment_by_race_ethnicity.values_at(year)
   end
 
   def special_education_by_year
