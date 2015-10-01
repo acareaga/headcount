@@ -149,6 +149,14 @@ class EnrollmentTest < Minitest::Test
                    2014 => 0.037}, district.enrollment.participation_by_race_or_ethnicity(:asian))
   end
 
+  def test_participation_by_race_or_ethnicity
+    path       = File.expand_path("./data", __dir__)
+    repository = DistrictRepository.from_csv(path)
+    district   = repository.find_by_name("ACADEMY 20")
+
+    assert_equal UnknownRaceError, district.enrollment.participation_by_race_or_ethnicity(:bad_race)
+  end
+
   def test_participation_by_race_or_ethnicity_in_year
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)

@@ -2,6 +2,7 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require_relative 'district'
 require_relative 'file_parser'
+require_relative 'formatting'
 require 'pry'
 
 class EconomicProfile

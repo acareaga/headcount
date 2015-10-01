@@ -3,16 +3,13 @@ require 'minitest/pride'
 require 'pry'
 
 class FileParserTest < Minitest::Test
-  def test_file_parser_class_exists
-    skip
-  end
 
   def test_average_proficiency_by_subject_math_parses_correctly
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
                 .statewide_testing.proficient_for_subject_by_grade_in_year(:math, 3, 2008)
-                
+
     assert_equal 0.857, district
   end
 

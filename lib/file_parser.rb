@@ -4,7 +4,7 @@ require 'pry'
 
 class FileParser
 
-  UNRECOGNIZED_DATA = [nil, "LNE", "#VALUE!", "r/n/", "NA"]
+  UNRECOGNIZED_DATA = ["LNE", "#VALUE!", "r/n/", "NA", nil]
   attr_reader :path, :repo_hash, :filename, :data
 
   def initialize(path)
@@ -16,13 +16,12 @@ class FileParser
   def read_file(file_name) # joins path and reads file
     fullpath = File.join path, file_name
     rows     = CSV.read(fullpath, headers: true, header_converters: :symbol)
-    rows.map(&:to_h).group_by { |row| row.fetch(:location) }
+    rows.map(&:to_h)
+        .group_by { |row| row.fetch(:location) }
   end
 
   def remove_unrecognized_data(rows)
-    rows.each do |row|
-      row.delete_if { UNRECOGNIZED_DATA.include? row.value }
-    end
+      rows.reject { |row| row.value == UNRECOGNIZED_DATA }
   end
 
   def file_loader # need to save result as data hash, create district framework below
@@ -299,6 +298,6 @@ class FileParser
   end
 
   def truncate(percentage)
-    percentage[0..4].to_f
+    percentage.to_s[0..4].to_f
   end
 end

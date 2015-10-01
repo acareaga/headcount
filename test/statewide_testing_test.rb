@@ -21,6 +21,15 @@ class StatewideTestingTest < Minitest::Test
                   }, district)
   end
 
+  def test_scores_by_subject_on_invalid_grade_returns_data_error
+    path       = File.expand_path("./data", __dir__)
+    repository = DistrictRepository.from_csv(path)
+    district   = repository.find_by_name("ACADEMY 20")
+                .statewide_testing.proficient_by_grade(4)
+
+    assert_equal UnknownDataError, district
+  end
+
   def test_grade_8_scores_by_subject
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
@@ -82,24 +91,34 @@ class StatewideTestingTest < Minitest::Test
     assert_equal 0.378, district
   end
 
-  def test_proficient_for_subject_by_race_in_year_unknown_subject
-    skip
+  def test_proficient_for_subject_by_race_in_year_unknown_subject_raises_error
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
                 .statewide_testing.proficient_for_subject_by_race_in_year(:history, :black, 2013)
 
-    assert_raise "UnknownDataError", district
+    assert_equal UnknownDataError, district
   end
 
   def test_proficient_by_race_or_ethnicity
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
                 .statewide_testing.proficient_by_race_or_ethnicity(:black)
 
-    assert_equal "UnknownDataError", district
+    assert_equal({2011=>{:math=>0.424, :reading=>0.662, :writing=>0.515},
+                  2012=>{:math=>0.424, :reading=>0.694, :writing=>0.504},
+                  2013=>{:math=>0.44, :reading=>0.669, :writing=>0.481},
+                  2014=>{:math=>0.42, :reading=>0.703, :writing=>0.519}}, district)
+  end
+
+  def test_proficient_by_race_or_ethnicity_returns_error_for_bad_race
+    path       = File.expand_path("./data", __dir__)
+    repository = DistrictRepository.from_csv(path)
+    district   = repository.find_by_name("ACADEMY 20")
+                .statewide_testing.proficient_by_race_or_ethnicity(:BLAHHAB)
+
+    assert_equal UnknownRaceError, district
   end
 
   def test_proficient_for_subject_in_year
@@ -107,7 +126,7 @@ class StatewideTestingTest < Minitest::Test
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
                 .statewide_testing.proficient_for_subject_in_year(:math, 2011)
-                
+
     assert_equal 0.68, district
   end
 end
