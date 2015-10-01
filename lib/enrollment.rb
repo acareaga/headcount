@@ -118,23 +118,34 @@ class Enrollment
 
   def participation_by_race_or_ethnicity_in_year(year)
     # returns a hash with race markers as keys and a three-digit floating point number representing a percentage.
-    @pupil_enrollment_by_race_ethnicity.values_at(year)
+    { :asian => @pupil_enrollment_by_race_ethnicity[:"asian students"][year],
+      :black => @pupil_enrollment_by_race_ethnicity[:"black students"][year],
+      :hispanic => @pupil_enrollment_by_race_ethnicity[:"hispanic students"][year],
+      :white => @pupil_enrollment_by_race_ethnicity[:"white students"][year],
+      :native_american => @pupil_enrollment_by_race_ethnicity[:"american indian students"][year],
+      :pacific_islander => @pupil_enrollment_by_race_ethnicity[:"native hawaiian or other pacific islander"][year],
+      :two_or_more => @pupil_enrollment_by_race_ethnicity[:"two or more races"][year]
+    }
   end
 
   def special_education_by_year
     # returns a hash with years as keys and an floating point three-significant digits representing a percentage.
+    @special_education
   end
 
   def special_education_in_year(year)
     #  returns a single three-digit floating point percentage.
+    @special_education.values_at(year).pop
   end
 
   def remediation_by_year
     # method returns a hash with years as keys and an floating point three-significant digits representing a percentage.
+    @remediation
   end
 
   def remediation_in_year(year)
     # method returns a single three-digit floating point percentage
     # or nil for unknown year
+    @remediation.values_at(year).pop
   end
 end

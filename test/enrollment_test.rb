@@ -154,42 +154,51 @@ class EnrollmentTest < Minitest::Test
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
 
-    assert_equal 0.002, district.enrollment.participation_by_race_or_ethnicity_in_year(2012)
+    assert_equal({:asian=>0.038,
+                  :black=>0.031,
+                  :hispanic=>0.121,
+                  :white=>0.75,
+                  :native_american=>0.004,
+                  :pacific_islander=>0.004,
+                  :two_or_more=>0.053}, district.enrollment.participation_by_race_or_ethnicity_in_year(2012))
   end
 
   def test_special_education_by_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
 
-    assert_equal 0.002, district.enrollment.special_education_by_year
+    assert_equal({2009=>0.075,
+                  2011=>0.079,
+                  2012=>0.078,
+                  2013=>0.079,
+                  2010=>0.078,
+                  2014=>0.079}, district.enrollment.special_education_by_year)
   end
 
   def test_special_education_in_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
 
-    assert_equal 0.002, district.enrollment.special_education_in_year(2012)
+    assert_equal 0.078, district.enrollment.special_education_in_year(2012)
   end
 
   def test_remediation_by_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
 
-    assert_equal 0.002, district.enrollment.remediation_by_year
+    assert_equal({2011=>0.263,
+                  2010=>0.294,
+                  2009=>0.264}, district.enrollment.remediation_by_year)
   end
 
   def test_remediation_in_year
-    skip
     path       = File.expand_path("./data", __dir__)
     repository = DistrictRepository.from_csv(path)
     district   = repository.find_by_name("ACADEMY 20")
 
-    assert_equal 0.002, district.enrollment.remediation_in_year(2012)
+    assert_equal 0.263, district.enrollment.remediation_in_year(2011)
   end
 end
