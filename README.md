@@ -6,10 +6,11 @@ Headcount is the final pair project in Module 1 at the Turing School. The applic
 
 [Project Outline](https://github.com/turingschool/curriculum/blob/master/source/projects/headcount.markdown) | [Test Harness](https://github.com/turingschool-examples/headcount_test_harness)
 
-clone the project in your terminal by running `git clone git@github.com:acareaga/headcount.git`
+## Instructions
+
+Clone the project in your terminal by running `git clone git@github.com:acareaga/headcount.git`
 
 Follow each section to interact with the data:
-
 * [District Kindergarten](headcount/iteration_0.markdown)
 * [Analysis: District Kindergarten](headcount/iteration_1.markdown)
 * [High School Graduation](headcount/iteration_2.markdown)
